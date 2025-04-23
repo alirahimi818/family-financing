@@ -1,0 +1,53 @@
+{
+  "node_modules/material-icons/iconfont/material-icons-outlined.woff": {
+    "file": "assets/material-icons-outlined-BpWbwl2n.woff",
+    "src": "node_modules/material-icons/iconfont/material-icons-outlined.woff"
+  },
+  "node_modules/material-icons/iconfont/material-icons-outlined.woff2": {
+    "file": "assets/material-icons-outlined-DZhiGvEA.woff2",
+    "src": "node_modules/material-icons/iconfont/material-icons-outlined.woff2"
+  },
+  "node_modules/material-icons/iconfont/material-icons-round.woff": {
+    "file": "assets/material-icons-round-BDlwx-sv.woff",
+    "src": "node_modules/material-icons/iconfont/material-icons-round.woff"
+  },
+  "node_modules/material-icons/iconfont/material-icons-round.woff2": {
+    "file": "assets/material-icons-round-DrirKXBx.woff2",
+    "src": "node_modules/material-icons/iconfont/material-icons-round.woff2"
+  },
+  "node_modules/material-icons/iconfont/material-icons-sharp.woff": {
+    "file": "assets/material-icons-sharp-CH1KkVu7.woff",
+    "src": "node_modules/material-icons/iconfont/material-icons-sharp.woff"
+  },
+  "node_modules/material-icons/iconfont/material-icons-sharp.woff2": {
+    "file": "assets/material-icons-sharp-gidztirS.woff2",
+    "src": "node_modules/material-icons/iconfont/material-icons-sharp.woff2"
+  },
+  "node_modules/material-icons/iconfont/material-icons-two-tone.woff": {
+    "file": "assets/material-icons-two-tone-B7wz7mED.woff",
+    "src": "node_modules/material-icons/iconfont/material-icons-two-tone.woff"
+  },
+  "node_modules/material-icons/iconfont/material-icons-two-tone.woff2": {
+    "file": "assets/material-icons-two-tone-DuNIpaEj.woff2",
+    "src": "node_modules/material-icons/iconfont/material-icons-two-tone.woff2"
+  },
+  "node_modules/material-icons/iconfont/material-icons.woff": {
+    "file": "assets/material-icons-Dr0goTwe.woff",
+    "src": "node_modules/material-icons/iconfont/material-icons.woff"
+  },
+  "node_modules/material-icons/iconfont/material-icons.woff2": {
+    "file": "assets/material-icons-kAwBdRge.woff2",
+    "src": "node_modules/material-icons/iconfont/material-icons.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CXLmBxFd.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-eMHK6VFw.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
