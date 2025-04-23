@@ -170,7 +170,24 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                <span class="material-icons-outlined mr-1">dashboard</span>
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('categories') }}" :active="request()->routeIs('categories')">
+                <span class="material-icons-outlined mr-1">menu</span>
+                Categories
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('tags') }}" :active="request()->routeIs('tags')">
+                <span class="material-icons-outlined mr-1">local_offer</span>
+                Tags
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('transactions') }}" :active="request()->routeIs('transactions')">
+                <span class="material-icons-outlined mr-1">receipt_long</span>
+                Transactions
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('periodicTransactions') }}" :active="request()->routeIs('periodicTransactions')">
+                <span class="material-icons-outlined mr-1">schedule</span>
+                Periodic Transactions
             </x-responsive-nav-link>
         </div>
 
