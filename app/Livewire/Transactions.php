@@ -139,6 +139,7 @@ class Transactions extends Component
 
         $this->showModal = false;
         $this->resetInput();
+        $this->tags = Tag::all();
     }
 
     public function delete($id)
@@ -152,6 +153,15 @@ class Transactions extends Component
         $transaction->delete();
     }
 
+    public function addNewTag()
+    {
+        $tag = Tag::create([
+            'name' => $this->tagSearch
+        ]);
+        $this->updated('tagSearch', $this->tagSearch);
+        $this->tag_ids[] = $tag->id;
+    }
+
     private function resetInput()
     {
         $this->title = '';
@@ -161,5 +171,7 @@ class Transactions extends Component
         $this->transaction_date = '';
         $this->tag_ids = [];
         $this->transactionId = null;
+        $this->tagSearch = '';
+        $this->is_periodic = false;
     }
 }

@@ -44,7 +44,7 @@
                                     </svg>
                                     {{ $periodic->is_active ? 'Deactivate' : 'Activate' }}
                                 </button>
-                                <button wire:click="delete({{ $periodic->id }})"
+                                <button wire:click="delete({{ $periodic->id }})" wire:confirm="Are you sure?"
                                         class="text-red-600 hover:text-red-800 flex items-center">
                                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                          xmlns="http://www.w3.org/2000/svg">

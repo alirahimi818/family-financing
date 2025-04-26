@@ -40,7 +40,7 @@
         @if($showModal)
             <div
                 class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
-                <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4 sm:mx-auto transform transition-all border-4 {{ $type == 'income' ? 'border-green-500' : 'border-red-400' }}">
+                <div class="bg-white rounded-lg p-6 pb-10 w-full max-h-screen overflow-y-auto max-w-lg mx-4 sm:mx-auto transform transition-all border-4 {{ $type == 'income' ? 'border-green-500' : 'border-red-400' }}">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ $isEditing ? 'Edit Transaction' : 'Add Transaction' }}</h2>
                     <form wire:submit.prevent="save">
                         <div class="mb-4">
@@ -77,7 +77,10 @@
                                         <span class="text-gray-700">{{ $tag->name }}</span>
                                     </label>
                                 @empty
-                                    <p class="text-gray-500 text-sm">No tags found.</p>
+                                    <button type="button" wire:click="addNewTag()" class="bg-blue-600 text-white px-2 py-2 w-full rounded-md hover:bg-blue-700 flex items-center transition">
+                                        <span class="material-icons-outlined">add</span>
+                                        Add new Tag
+                                    </button>
                                 @endforelse
                             </div>
                             @error('tag_ids') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
@@ -159,7 +162,7 @@
                                     </svg>
                                     Edit
                                 </button>
-                                <button wire:click="delete({{ $transaction->id }})"
+                                <button wire:click="delete({{ $transaction->id }})" wire:confirm="Are you sure?"
                                         class="text-red-600 hover:text-red-800 flex items-center">
                                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                          xmlns="http://www.w3.org/2000/svg">
