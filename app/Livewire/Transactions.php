@@ -16,7 +16,7 @@ class Transactions extends Component
 
     public $categories, $tags;
     public $title, $amount, $type, $category_id, $transaction_date, $tag_ids = [];
-    public $transactionId, $isEditing, $is_periodic = false, $showModal = false;
+    public $transactionId, $isEditing, $is_periodic = false, $showModal = false, $showFilter = false;
     public $search = '', $filterType = '', $filterCategory = '', $start_date = '', $end_date = '', $tagSearch = '';
     public $perPage = 20, $inventory = 0;
     public $currentUser;
@@ -37,8 +37,14 @@ class Transactions extends Component
         $this->currentUser = auth()->user();
         $this->categories = Category::all();
         $this->tags = Tag::all();
-        $this->start_date = now()->startOfMonth()->format('Y-m-d');
-        $this->end_date = now()->endOfMonth()->format('Y-m-d');
+        // Set start_date to the 26th of the current month
+        $this->start_date = now()->day >= 26
+            ? now()->startOfMonth()->addDays(25)->format('Y-m-d')
+            : now()->startOfMonth()->subMonth()->addDays(25)->format('Y-m-d');
+        // Set end_date to the 25th of the next month
+        $this->end_date = now()->day >= 26
+            ? now()->startOfMonth()->addMonth()->addDays(24)->format('Y-m-d')
+            : now()->startOfMonth()->addDays(24)->format('Y-m-d');
     }
 
     public function updated($name, $value)
@@ -50,28 +56,56 @@ class Transactions extends Component
         }
     }
 
+    public function filterCollapse()
+    {
+        $this->showFilter = !$this->showFilter;
+    }
+
+    public function clearFilter()
+    {
+        $this->reset();
+        $this->mount();
+    }
+
     public function render()
     {
-        $this->inventory = $this->currentUser->inventory->quantity ?? 0;
-        $transactions = Transaction::query()
-            ->when($this->search, function ($q) {
-                $q->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('category', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas('tags', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
-                    });
-            })
-            ->when($this->filterType, fn($q) => $q->where('type', $this->filterType))
-            ->when($this->filterCategory, fn($q) => $q->where('category_id', $this->filterCategory))
-            ->when($this->start_date, fn($q) => $q->whereDate('transaction_date', '>=', $this->start_date))
-            ->when($this->end_date, fn($q) => $q->whereDate('transaction_date', '<=', $this->end_date))
-            ->with(['category', 'tags'])
-            ->latest()
-            ->paginate($this->perPage);
+        $userId = auth()->id();
 
-        return view('livewire.transactions', compact('transactions'))->layout('layouts.app');
+        // Base query with eager loading
+        $query = Transaction::query()
+            ->where('user_id', $userId)
+            ->with(['category', 'tags'])
+            ->latest();
+
+        // Apply dynamic filters
+        $query->when($this->search, function ($q) {
+            $q->where(function ($query) {
+                $query->where('title', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('category', fn($q) => $q->where('name', 'like', '%' . $this->search . '%'))
+                    ->orWhereHas('tags', fn($q) => $q->where('name', 'like', '%' . $this->search . '%'));
+            });
+        })->when($this->filterType, fn($q) => $q->where('type', $this->filterType))
+            ->when($this->filterCategory, fn($q) => $q->where('category_id', $this->filterCategory))
+            ->when($this->start_date && $this->end_date, fn($q) => $q->whereBetween('transaction_date', [$this->start_date, $this->end_date]))
+            ->when($this->start_date && !$this->end_date, fn($q) => $q->where('transaction_date', '>=', $this->start_date))
+            ->when(!$this->start_date && $this->end_date, fn($q) => $q->where('transaction_date', '<=', $this->end_date));
+
+        // Calculate totals in a single query
+        $totals = $query->clone()
+            ->selectRaw('
+                SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as income_total,
+                SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as expense_total
+            ')
+            ->first();
+
+        $income_total = $totals->income_total ?? 0;
+        $expense_total = $totals->expense_total ?? 0;
+
+        // Paginate transactions
+        $transactions = $query->paginate($this->perPage);
+
+        return view('livewire.transactions', compact('transactions', 'income_total', 'expense_total'))
+            ->layout('layouts.app');
     }
 
     public function create($type)

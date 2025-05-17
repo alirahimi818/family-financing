@@ -6,18 +6,19 @@ use App\Models\PeriodicTransaction;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Carbon\Carbon;
 
 class Dashboard extends Component
 {
-
     public $month;
     public $year;
     public $availableYears;
 
     public function mount()
     {
-        $this->month = now()->month;
-        $this->year = now()->year;
+        // Set default month and year based on the 26th
+        $this->year = now()->day >= 26 ? now()->year : now()->subMonth()->year;
+        $this->month = now()->day >= 26 ? now()->month : now()->subMonth()->month;
         // Dynamically fetch available years from transactions
         $this->availableYears = Transaction::where('user_id', auth()->id())
             ->selectRaw("DISTINCT strftime('%Y', transaction_date) as year")
@@ -43,15 +44,17 @@ class Dashboard extends Component
     {
         $userId = auth()->id();
 
+        // Calculate start and end dates for the selected period (26th to 25th)
+        $startDate = Carbon::create($this->year, $this->month, 26)->startOfDay();
+        $endDate = $startDate->copy()->addMonth()->subDay()->endOfDay();
+
         // Key Metrics
         $totalTransactions = Transaction::where('user_id', $userId)
-            ->whereYear('transaction_date', $this->year)
-            ->whereMonth('transaction_date', $this->month)
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->count();
         $totalInventory = Inventory::where('user_id', $userId)->sum('quantity');
         $monthlyNetChange = Transaction::where('user_id', $userId)
-            ->whereYear('transaction_date', $this->year)
-            ->whereMonth('transaction_date', $this->month)
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->selectRaw('SUM(CASE WHEN type = "income" THEN amount ELSE -amount END) as net')
             ->first()->net ?? 0;
         $periodicData = PeriodicTransaction::where('user_id', $userId)
@@ -64,20 +67,20 @@ class Dashboard extends Component
         $activePeriodicIncomeTotal = $periodicData->income_total ?? 0;
         $activePeriodicExpenseTotal = $periodicData->expense_total ?? 0;
 
-        // Line Chart Data
-        $months = range(1, 12);
+        // Line Chart Data (January to December for the selected year)
         $incomeData = [];
         $expenseData = [];
-        foreach ($months as $m) {
+        for ($m = 1; $m <= 12; $m++) {
+            // For each month m, the period is from the 26th of the previous month (m-1) to the 25th of month m
+            $monthStart = Carbon::create($this->year, $m, 26)->subMonth()->startOfDay();
+            $monthEnd = Carbon::create($this->year, $m, 25)->endOfDay();
             $income = Transaction::where('user_id', $userId)
                 ->where('type', 'income')
-                ->whereYear('transaction_date', $this->year)
-                ->whereMonth('transaction_date', $m)
+                ->whereBetween('transaction_date', [$monthStart, $monthEnd])
                 ->sum('amount');
             $expense = Transaction::where('user_id', $userId)
                 ->where('type', 'expense')
-                ->whereYear('transaction_date', $this->year)
-                ->whereMonth('transaction_date', $m)
+                ->whereBetween('transaction_date', [$monthStart, $monthEnd])
                 ->sum('amount');
             $incomeData[] = (float) $income;
             $expenseData[] = (float) $expense;
@@ -85,8 +88,7 @@ class Dashboard extends Component
 
         // Pie Chart Data
         $categoryData = Transaction::where('user_id', $userId)
-            ->whereYear('transaction_date', $this->year)
-            ->whereMonth('transaction_date', $this->month)
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->join('categories', 'transactions.category_id', '=', 'categories.id')
             ->groupBy('categories.id', 'categories.name')
             ->selectRaw('categories.name, SUM(transactions.amount) as total')
@@ -97,8 +99,7 @@ class Dashboard extends Component
         // Bar Chart Data
         $tagData = Transaction::where('user_id', $userId)
             ->where('transactions.type', 'expense')
-            ->whereYear('transaction_date', $this->year)
-            ->whereMonth('transaction_date', $this->month)
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->join('transaction_tag', 'transactions.id', '=', 'transaction_tag.transaction_id')
             ->join('tags', 'transaction_tag.tag_id', '=', 'tags.id')
             ->groupBy('tags.id', 'tags.name')
@@ -110,8 +111,7 @@ class Dashboard extends Component
 
         // Recent Transactions
         $recentTransactions = Transaction::where('user_id', $userId)
-            ->whereYear('transaction_date', $this->year)
-            ->whereMonth('transaction_date', $this->month)
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->with(['category', 'tags'])
             ->latest()
             ->take(5)
@@ -121,6 +121,8 @@ class Dashboard extends Component
         Log::info('Dashboard data', [
             'month' => $this->month,
             'year' => $this->year,
+            'startDate' => $startDate->toDateString(),
+            'endDate' => $endDate->toDateString(),
             'incomeData' => $incomeData,
             'expenseData' => $expenseData,
             'categoryData' => $categoryData,

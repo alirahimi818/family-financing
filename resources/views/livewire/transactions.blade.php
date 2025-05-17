@@ -1,9 +1,14 @@
 <div class="max-w-6xl mx-auto">
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <div class="flex flex-wrap justify-between items-center mb-4">
+        <div class="flex flex-col gap-2 mb-2">
             <h1 class="text-2xl font-semibold text-gray-800">Manage Transactions</h1>
-            <div class="flex flex-wrap items-center gap-2">
-                <div class="mr-1 font-bold">Inventory: {{number_format($inventory)}} €</div>
+            <div class="mr-1 font-bold">Inventory: {{number_format($inventory)}} €</div>
+            <div class="mr-1 font-bold text-green-600">Income: {{number_format($income_total)}} €</div>
+            <div class="mr-1 font-bold text-red-500">Expose: {{number_format($expense_total)}} €</div>
+        </div>
+
+        <div class="flex flex-wrap justify-between items-center mb-4">
+            <div class="flex flex-wrap gap-2">
                 <button wire:click="create('income')"
                         class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 flex items-center transition">
                     <span class="material-icons-outlined">add_circle_outline</span>
@@ -13,10 +18,22 @@
                     <span class="material-icons-outlined">remove_circle_outline</span>
                 </button>
             </div>
+            <div class="flex flex-wrap gap-2">
+                <button wire:click="clearFilter" wire:show="showFilter"
+                        class="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 flex items-center gap-1 transition">
+                    clear filter
+                    <span class="material-icons-outlined">delete</span>
+                </button>
+                <button wire:click="filterCollapse"
+                        class="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 flex items-center transition">
+                    <span class="material-icons-outlined">filter_alt</span>
+                </button>
+            </div>
         </div>
 
+
         <!-- Filters -->
-        <div class="mb-6 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        <div class="mb-6 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0" wire:show="showFilter">
             <input wire:model.live="search" type="text" placeholder="Search by title..."
                    class="w-full sm:w-1/3 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <select wire:model.live="filterType"
@@ -32,15 +49,18 @@
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </select>
-            <input wire:model.live="start_date" type="date" placeholder="Start Date" class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <input wire:model.live="end_date" type="date" placeholder="End Date" class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input wire:model.live="start_date" type="date" placeholder="Start Date"
+                   class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input wire:model.live="end_date" type="date" placeholder="End Date"
+                   class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
 
         <!-- Modal -->
         @if($showModal)
             <div
                 class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
-                <div class="bg-white rounded-lg p-6 pb-10 w-full max-h-screen overflow-y-auto max-w-lg mx-4 sm:mx-auto transform transition-all border-4 {{ $type == 'income' ? 'border-green-500' : 'border-red-400' }}">
+                <div
+                    class="bg-white rounded-lg p-6 pb-10 w-full max-h-screen overflow-y-auto max-w-lg mx-4 sm:mx-auto transform transition-all border-4 {{ $type == 'income' ? 'border-green-500' : 'border-red-400' }}">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ $isEditing ? 'Edit Transaction' : 'Add Transaction' }}</h2>
                     <form wire:submit.prevent="save">
                         <div class="mb-4">
@@ -69,15 +89,18 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-medium mb-2">Tags (Optional)</label>
-                            <input wire:model.live.debounce="tagSearch" type="text" placeholder="Search tags..." class="w-full border rounded-md p-2 mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input wire:model.live.debounce="tagSearch" type="text" placeholder="Search tags..."
+                                   class="w-full border rounded-md p-2 mb-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                                 @forelse($tags as $tag)
                                     <label class="flex items-center space-x-2 w-fit" wire:key="{{$tag->id}}">
-                                        <input wire:model.live="tag_ids" type="checkbox" value="{{ $tag->id }}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <input wire:model.live="tag_ids" type="checkbox" value="{{ $tag->id }}"
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                         <span class="text-gray-700">{{ $tag->name }}</span>
                                     </label>
                                 @empty
-                                    <button type="button" wire:click="addNewTag()" class="bg-blue-600 text-white px-2 py-2 w-full rounded-md hover:bg-blue-700 flex items-center transition">
+                                    <button type="button" wire:click="addNewTag()"
+                                            class="bg-blue-600 text-white px-2 py-2 w-full rounded-md hover:bg-blue-700 flex items-center transition">
                                         <span class="material-icons-outlined">add</span>
                                         Add new Tag
                                     </button>
@@ -95,7 +118,8 @@
                         @if(!$isEditing)
                             <div class="mb-4">
                                 <label class="flex items-center space-x-2">
-                                    <input wire:model.live="is_periodic" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <input wire:model.live="is_periodic" type="checkbox"
+                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                     <span class="text-gray-700">Register as monthly periodic transaction</span>
                                 </label>
                             </div>

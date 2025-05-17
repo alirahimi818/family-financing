@@ -16,9 +16,13 @@
     <div class="mb-6 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <select wire:model.live="month"
                 class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            @foreach(range(1, 12) as $m)
-                <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-            @endforeach
+            @for($m = 1; $m <= 12; $m++)
+                @php
+                    // Label is the month after the start of the period (26th of previous month)
+                    $label = \Carbon\Carbon::create(null, $m, 26)->addMonth()->format('F');
+                @endphp
+                <option value="{{ $m }}">{{ $label }}</option>
+            @endfor
         </select>
         <select wire:model.live="year"
                 class="w-full sm:w-1/4 border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -144,11 +148,13 @@
         // Global initializeCharts function
         window.initializeCharts = function (month, year, incomeData, expenseData, categoryData, tagData) {
             try {
-
                 // Destroy existing charts
                 if (window.trendChart) window.trendChart.destroy();
                 if (window.categoryChart) window.categoryChart.destroy();
                 if (window.tagChart) window.tagChart.destroy();
+
+                // Fixed labels for Line Chart (Jan to Dec)
+                const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
                 // Line Chart
                 const ctxTrend = document.getElementById('transactionTrendChart')?.getContext('2d');
@@ -156,7 +162,7 @@
                 window.trendChart = new Chart(ctxTrend, {
                     type: 'line',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        labels: labels,
                         datasets: [
                             {
                                 label: 'Income',
@@ -179,11 +185,18 @@
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: {position: 'top'},
-                            tooltip: {mode: 'index', intersect: false}
+                            legend: { position: 'top' },
+                            tooltip: { mode: 'index', intersect: false }
                         },
                         scales: {
-                            y: {beginAtZero: true}
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return value.toFixed(2) + ' €';
+                                    }
+                                }
+                            }
                         }
                     }
                 });
@@ -212,13 +225,13 @@
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: {position: 'top'},
+                            legend: { position: 'top' },
                             tooltip: {
                                 callbacks: {
                                     label: function (context) {
                                         let label = context.label || '';
                                         let value = context.raw || 0;
-                                        return `${label}: ${value.toFixed(2)}`;
+                                        return `${label}: ${value.toFixed(2)} €`;
                                     }
                                 }
                             }
@@ -336,7 +349,7 @@
                 // Client-side tag selection
                 document.getElementById('tagExpenseChart').onclick = function (evt) {
                     try {
-                        const activeElement = window.tagChart.getElementsAtEventForMode(evt, 'nearest', {intersect: true}, false);
+                        const activeElement = window.tagChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
                         if (activeElement.length > 0) {
                             window.selectedTag = window.tagChart.data.labels[activeElement[0].index];
                             window.tagChart.data.datasets[0].backgroundColor = tagLabels.map((label, index) => {
