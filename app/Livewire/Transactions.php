@@ -101,6 +101,27 @@ class Transactions extends Component
     {
         $this->validate();
 
+        // Initialize or fetch inventory
+        $inventory = Inventory::firstOrCreate(
+            ['user_id' => $this->currentUser->id],
+            ['quantity' => 0]
+        );
+
+        if ($this->isEditing) {
+            // Handle inventory for updates
+            $oldTransaction = Transaction::findOrFail($this->transactionId);
+            $oldAmount = $oldTransaction->amount;
+            $oldType = $oldTransaction->type;
+
+            // Reverse old transaction effect
+            $inventory->quantity -= ($oldType === 'income' ? $oldAmount : -$oldAmount);
+            // Apply new transaction effect
+            $inventory->quantity += ($this->type === 'income' ? $this->amount : -$this->amount);
+        } else {
+            // Handle inventory for new transactions
+            $inventory->quantity += ($this->type === 'income' ? $this->amount : -$this->amount);
+        }
+
         $transaction = Transaction::updateOrCreate(
             ['id' => $this->transactionId],
             [
@@ -113,14 +134,8 @@ class Transactions extends Component
             ]
         );
 
-        // Update inventory
-        $inventory = Inventory::firstOrCreate(
-            ['user_id' => $transaction->user_id],
-            ['quantity' => 0]
-        );
-        $inventory->quantity += ($this->type === 'income' ? $this->amount : -$this->amount);
+        // Save inventory changes
         $inventory->save();
-
         $transaction->tags()->sync($this->tag_ids);
 
         // Register as periodic if checked
@@ -147,6 +162,7 @@ class Transactions extends Component
         $transaction = Transaction::findOrFail($id);
         $inventory = Inventory::where('user_id', $transaction->user_id)->first();
         if ($inventory) {
+            // Reverse transaction effect on deletion
             $inventory->quantity -= ($transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
             $inventory->save();
         }
