@@ -16,7 +16,7 @@ class Transactions extends Component
 
     public $categories, $tags;
     public $title, $amount, $type, $category_id, $transaction_date, $tag_ids = [];
-    public $transactionId, $isEditing, $is_periodic = false, $showModal = false, $showFilter = false;
+    public $transactionId, $isEditing, $is_periodic = false, $showModal = false, $showFilter = false, $editInventory = false;
     public $search = '', $filterType = '', $filterCategory = '', $start_date = '', $end_date = '', $tagSearch = '';
     public $perPage = 20, $inventory = 0;
     public $currentUser;
@@ -67,9 +67,31 @@ class Transactions extends Component
         $this->mount();
     }
 
+
+    public function editInventoryCollapse()
+    {
+        $this->editInventory = !$this->editInventory;
+    }
+
+    public function saveInventory()
+    {
+        $this->validate([
+            'inventory' => 'required|numeric|min:0',
+        ]);
+
+        $inventory = Inventory::firstOrCreate(
+            ['user_id' => $this->currentUser->id],
+            ['quantity' => 0]
+        );
+        $inventory->quantity = $this->inventory;
+        $inventory->save();
+        $this->editInventory = false;
+    }
+
     public function render()
     {
-        $userId = auth()->id();
+        $this->inventory = $this->currentUser->inventory->quantity ?? 0;
+        $userId = $this->currentUser->id;
 
         // Base query with eager loading
         $query = Transaction::query()

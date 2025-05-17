@@ -2,9 +2,17 @@
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <div class="flex flex-col gap-2 mb-2">
             <h1 class="text-2xl font-semibold text-gray-800">Manage Transactions</h1>
-            <div class="mr-1 font-bold">Inventory: {{number_format($inventory)}} €</div>
-            <div class="mr-1 font-bold text-green-600">Income: {{number_format($income_total)}} €</div>
-            <div class="mr-1 font-bold text-red-500">Expose: {{number_format($expense_total)}} €</div>
+            <div class="mr-1 font-bold flex items-center gap-2">Inventory:
+                @if($editInventory)
+                    <input wire:model="inventory" type="number" step="0.01" class="w-1/2 border h-10 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <span class="material-icons-outlined cursor-pointer text-green-600" wire:click="saveInventory">check_circle</span>
+                @else
+                    <span>{{number_format($inventory, 2)}} €</span>
+                    <span class="material-icons-outlined cursor-pointer text-blue-500" wire:click="editInventoryCollapse">border_color</span>
+                @endif
+            </div>
+            <div class="mr-1 font-bold text-green-600">Income: {{number_format($income_total, 2)}} €</div>
+            <div class="mr-1 font-bold text-red-500">Expose: {{number_format($expense_total, 2)}} €</div>
         </div>
 
         <div class="flex flex-wrap justify-between items-center mb-4">
