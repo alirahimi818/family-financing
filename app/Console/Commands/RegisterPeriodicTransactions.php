@@ -3,6 +3,7 @@ namespace App\Console\Commands;
 
 use App\Models\PeriodicTransaction;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class RegisterPeriodicTransactions extends Command
@@ -12,16 +13,16 @@ class RegisterPeriodicTransactions extends Command
 
     public function handle()
     {
-        $periodicTransactions = PeriodicTransaction::where('is_active', true)->get();
-
+        $periodicTransactions = PeriodicTransaction::query()->where('is_active', true)->where('transaction_date', '<=' , now()->subMonth()->startOfDay())->get();
         foreach ($periodicTransactions as $periodic) {
+            $newTransactionDate = Carbon::parse($periodic->transaction_date)->addMonth()->startOfDay();
             $transaction = Transaction::create([
                 'user_id' => $periodic->user_id,
                 'title' => $periodic->title,
                 'amount' => $periodic->amount,
                 'type' => $periodic->type,
                 'category_id' => $periodic->category_id,
-                'transaction_date' => now()->startOfMonth(),
+                'transaction_date' => $newTransactionDate,
             ]);
 
             if ($periodic->tag_ids) {
@@ -37,6 +38,8 @@ class RegisterPeriodicTransactions extends Command
                 $inventory->quantity += ($transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
                 $inventory->save();
             }
+            $periodic->transaction_date = $newTransactionDate;
+            $periodic->save();
         }
 
         $this->info('Periodic transactions registered successfully.');
