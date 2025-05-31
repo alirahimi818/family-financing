@@ -90,6 +90,7 @@ class Dashboard extends Component
         $categoryData = Transaction::where('user_id', $userId)
             ->whereBetween('transaction_date', [$startDate, $endDate])
             ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->where('categories.name', '!=', 'Einkommen')
             ->groupBy('categories.id', 'categories.name')
             ->selectRaw('categories.name, SUM(transactions.amount) as total')
             ->get()
