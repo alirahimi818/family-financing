@@ -11,6 +11,7 @@ class PeriodicTransaction extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'tag_ids' => 'array',
+        'transaction_date' => 'date',
         'is_active' => 'boolean',
     ];
 
