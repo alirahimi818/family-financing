@@ -74,8 +74,11 @@
                 @forelse($periodicTransactions as $periodic)
                     <tr class="border-b hover:bg-gray-50 transition">
                         <td class="p-3 text-gray-800">{{ $periodic->title ?? '-' }}</td>
-                        <td class="p-3 text-gray-800">{{ number_format($periodic->amount, 2) }} €</td>
-                        <td class="p-3 text-gray-800">{{ ucfirst($periodic->type) }}</td>
+                        <td class="p-3 text-gray-800 whitespace-nowrap">{{ number_format($periodic->amount, 2) }} €</td>
+                        <td class="p-3 text-gray-800">
+                        <span
+                            class="material-icons-outlined {{ $periodic->type == 'income' ? 'text-green-600' : 'text-red-600' }}">{{ $periodic->type == 'income' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        </td>
                         <td class="p-3 text-gray-800">{{ $periodic->category?->name ?? '-' }}</td>
                         <td class="p-3 text-gray-800">
                             @php
