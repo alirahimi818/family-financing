@@ -1,63 +1,127 @@
-# Family Financing — Personal Income & Expense Manager
+# 💰 Family Financing
+### 🧾 Personal Income & Expense Manager (Laravel + Livewire)
 
-This is a personal project created for testing and personal use. Anyone is free to use it if they find it helpful.
+A small, lightweight Laravel app for tracking **family income & expenses**.  
+Built as a personal side-project for simple daily finance management — feel free to use it! 😊
 
-Project overview
+---
 
-Family Financing is a lightweight Laravel application for tracking family income and expenses. It lets you record daily transactions, organize them by categories and tags, schedule recurring (periodic) transactions, and view summaries on a dashboard with charts.
+## ✨ What can it do?
+✅ Track **income & expense transactions**  
+✅ Organize by **categories** and **tags**  
+✅ Define **periodic (recurring) transactions**  
+✅ View a **live dashboard with charts**  
+✅ Quick setup with **SQLite** (but portable to MySQL/Postgres)
 
-Key features
-- Record transactions (income and expense) with title, amount, date, category, and tags.
-- Create and manage categories and tags for structured reporting.
-- Define periodic (recurring) transactions that can be applied on schedule.
-- Live dashboard with visual summaries and charts (built with Laravel Livewire).
-- Uses SQLite by default for quick local setup (can be configured to other DBs).
+---
 
-Tech stack
-- Backend: Laravel (Eloquent models for Transaction, Category, Tag, PeriodicTransaction, Inventory)
-- Frontend: Laravel Livewire, Vite, Tailwind CSS
-- Database: SQLite (default), compatible with MySQL/Postgres
+## 🧩 Key Features
+- 📝 **Transactions**
+  - Record incomes/expenses with **title, amount, date**
+  - Assign **one category** + **multiple tags**
+- 🗂️ **Categories & Tags**
+  - Keep your reporting clean and structured
+- 🔁 **Periodic Transactions**
+  - Model recurring payments/incomes (rent, salary, subscriptions, etc.)
+- 📊 **Dashboard**
+  - Visual summaries & charts (Livewire components)
+- 🪶 **Lightweight by Design**
+  - Minimal setup, fast dev experience
 
-Quick installation (development)
+---
 
-1. Clone the repository and enter the project folder:
-   git clone <repository-url>
-   cd family-financing
+## 🛠 Tech Stack
+- **Backend:** Laravel (Eloquent)
+  - Models: `Transaction`, `Category`, `Tag`, `PeriodicTransaction`, `Inventory`
+- **Frontend:** Livewire + Vite + Tailwind CSS
+- **Database:** SQLite (default) — compatible with MySQL/Postgres
 
-2. Install PHP dependencies:
-   composer install
+---
 
-3. Install JavaScript dependencies:
-   npm install
+## ⚡ Quick Start (Development)
 
-4. Create environment file and adjust settings (DB, APP_URL, etc.):
-   cp .env.example .env
-   # By default the project includes database/database.sqlite — ensure your .env uses it or configure another DB.
+```bash
+# 1) Clone & enter
+git clone https://github.com/alirahimi818/family-financing.git
+cd family-financing
 
-5. Generate app key:
-   php artisan key:generate
+# 2) Install backend deps
+composer install
 
-6. Run database migrations (and optionally seeders):
-   php artisan migrate
-   # php artisan db:seed
+# 3) Install frontend deps
+npm install
 
-7. Run dev servers / build assets:
-   # For development with hot reload
-   npm run dev
-   # Or build production assets
-   npm run build
+# 4) Setup environment
+cp .env.example .env
 
-8. Start the application:
-   php artisan serve
-   # Visit http://localhost:8000
+# 5) Generate app key
+php artisan key:generate
 
-Usage notes
-- The web UI (Livewire components) provides pages to manage Categories, Tags, Transactions, Periodic Transactions, and a Dashboard.
-- Transactions support many-to-many tags and belong to a category and user.
-- Periodic transactions can be used to model recurring incomes/expenses.
+# 6) Run migrations (optionally seed)
+php artisan migrate
+# php artisan db:seed
 
-Contributing
-- This is a personal project but open to contributions. Fork, create a branch for your feature/fix, and open a pull request.
+# 7) Run dev server
+npm run dev
+php artisan serve
+```
 
-License
-- This project is provided under the MIT License.
+Now open: **[http://localhost:8000](http://localhost:8000)** 🚀
+
+---
+
+## 🗃 Database Notes
+
+By default the project uses SQLite for fast local setup.
+Make sure your `.env` points to it:
+
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
+```
+
+Want MySQL/Postgres? Just change `.env` and rerun migrations.
+
+---
+
+## 🧭 Usage Flow (Super Simple)
+
+1. ➕ Create your **Categories**
+2. 🏷️ Add some **Tags**
+3. 🧾 Start adding **Transactions**
+4. 🔁 Define **Periodic Transactions** if you need recurring stuff
+5. 📊 Visit the **Dashboard** and enjoy your summaries 🎉
+
+---
+
+## 🤝 Contributing
+
+This is a personal project, but PRs are welcome!
+
+* Fork it 🍴
+* Create a new branch 🌿
+* Commit your changes ✅
+* Open a PR 🚀
+
+---
+
+## 📄 License
+
+MIT — do whatever you want, just keep the credit. 🙌
+
+---
+
+## 🌟 Ideas for Future (Optional Roadmap)
+
+If I ever continue this project, these might be cool:
+
+* 📤 Export reports (CSV / PDF)
+* 🌍 Multi-currency support
+* 👥 Multi-user / family members
+* 🌙 Dark mode
+* ☁️ Backup & restore
+
+---
+
+Made with ☕ + ❤️ using Laravel & Livewire.
+
