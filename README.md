@@ -6,6 +6,13 @@ Built as a personal side-project for simple daily finance management — feel fr
 
 ---
 
+## 📷 Screenshots
+![Dashboard](public/img/screenshot-1.png)
+![Transactions](public/img/screenshot-2.png)
+![Transactions](public/img/screenshot-3.png)
+
+---
+
 ## ✨ What can it do?
 ✅ Track **income & expense transactions**  
 ✅ Organize by **categories** and **tags**  
